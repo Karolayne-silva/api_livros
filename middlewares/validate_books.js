@@ -1,34 +1,59 @@
-const { body, validationResult } = require("express-validator");
+const { check, validationResult } = require("express-validator");
 
-const validateBooks = [
-  body("title").isEmpty().withMessage("Titulo é obrigatório"),
-  body("description").isEmpty().withMessage("Descrição é obrigatória").trim(),
-  body("author").isEmpty().withMessage("Autor é obrigatório").trim(),
-  body("category").isEmpty().withMessage("Categoria é obrigatória").trim(),
-  body("status").isEmpty().withMessage("Status é obrigatório").trim(),
-  body("reading_year").custom((value) => {
-    const year = parseInt(value, 10);
-    if (year < 1000 || year > new Date().getFullYear()) {
-      throw new Error(
-        "Ano de publicação deve ser um número entre 1000 e o ano atual"
-      );
-    }
-    return true;
-  }),
+const handleValidateBooks = (isOptional) => {
 
-  body("review").custom((value) => {
-    const review = parseInt(value, 10);
+  const validateBooks = [
+    check("title")
+      .optional(isOptional)
+      .notEmpty()
+      .withMessage("Titulo não pode ser vazio"),
+    check("description")
+      .optional(isOptional)
+      .notEmpty()
+      .withMessage("Descrição não pode ser vazio"),
+    check("author")
+      .optional(isOptional)
+      .notEmpty()
+      .withMessage("Autor não pode ser vazio"),
+    check("category")
+      .optional(isOptional)
+      .notEmpty()
+      .withMessage("Categoria não pode ser vazio"),
+    check("status")
+      .optional(isOptional)
+      .notEmpty()
+      .withMessage("Status não pode ser vazio"),
+  
+    check("reading_year")
+      .optional(isOptional)
+      .custom((value) => {
+        const year = parseInt(value, 10);
+        if (year < 1000 || year > new Date().getFullYear()) {
+          throw new Error(
+            "Ano de publicação deve ser um número entre 1000 e o ano atual"
+          );
+        }
+        return true;
+      }),
+  
+    check("review")
+      .optional(isOptional)
+      .custom((value) => {
+        const review = parseInt(value, 10);
+  
+        if (review < 1 || review > 5) {
+          throw new Error("A avaliação deve ser um número entre 1 e 5");
+        }
+        return true;
+      }),
+  ];
 
-    if (Number.isInteger(review) || review < 1 || review > 5) {
-      throw new Error("A avaliação deve ser um número entre 1 e 5");
-    }
-    return true;
-  }),
-];
+  return validateBooks;
+
+};
 
 const handleValidationErrors = (req, res, next) => {
-  console.log(req.body);
-  console.log(req.body.title);
+
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
@@ -42,6 +67,8 @@ const handleValidationErrors = (req, res, next) => {
 };
 
 module.exports = {
-  validateBooks,
+  handleValidateBooks,
   handleValidationErrors,
 };
+
+
