@@ -1,14 +1,11 @@
 const { body, validationResult } = require("express-validator");
 
 const validateBooks = [
+  body("title").isEmpty().withMessage("Titulo é obrigatório"),
   body("description").isEmpty().withMessage("Descrição é obrigatória").trim(),
-
   body("author").isEmpty().withMessage("Autor é obrigatório").trim(),
-
   body("category").isEmpty().withMessage("Categoria é obrigatória").trim(),
-
   body("status").isEmpty().withMessage("Status é obrigatório").trim(),
-
   body("reading_year").custom((value) => {
     const year = parseInt(value, 10);
     if (year < 1000 || year > new Date().getFullYear()) {

@@ -1,15 +1,18 @@
-//fazer conexao com mysql
 const { Sequelize } = require("sequelize");
+const dotenv = require("dotenv").config();
 
-const sequelize = new Sequelize("biblioteca", "root", "root", {
-  host: "localhost",
-  //qual banco quero integrar
-  dialect: "mysql",
-});
+const sequelize = new Sequelize(
+  process.env.DATABASE_NAME,
+  process.env.DATABASE_USER,
+  process.env.DATABASE_PASSWORD,
+  {
+    host: process.env.DATABASE_HOST,
+    dialect: "mysql",
+  }
+);
 
-
-//sequelize.sync() garante que todas as tabelas definidas nos seus modelos sejam criadas no banco de dados, caso não existam.
-sequelize.sync({ force: false }) 
+sequelize
+  .sync({ force: false })
   .then(() => {
     console.log("Tabelas sincronizadas com sucesso!");
   })
