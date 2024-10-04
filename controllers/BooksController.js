@@ -2,7 +2,6 @@ const Books = require("../models/Books");
 
 module.exports = class BooksController {
   static async create(req, res) {
-
     const {
       title,
       description,
@@ -27,7 +26,9 @@ module.exports = class BooksController {
     }
 
     if (existingBook) {
-      return res.status(500).json({ message: "Já existe um livro com esse titulo e descrição" });
+      return res
+        .status(500)
+        .json({ message: "Já existe um livro com esse titulo e descrição" });
     }
 
     const book = {
@@ -43,9 +44,9 @@ module.exports = class BooksController {
 
     try {
       await Books.create(book);
-      res.status(201).json({ message: "Livro cadastrado com sucesso!" });
+      return res.status(201).json({ message: "Livro cadastrado com sucesso!" });
     } catch (err) {
-      res.status(500).json({ message: err.message });
+      return res.status(500).json({ message: err.message });
     }
   }
 
@@ -54,13 +55,13 @@ module.exports = class BooksController {
       const books = await Books.findAll();
 
       if (books.length > 0) {
-        res
+        return res
           .status(200)
           .json({ message: "Livros retornados com sucesso!", books });
       }
-      res.status(204).send();
+      return res.status(204).send();
     } catch (err) {
-      res.status(500).json({ message: err.message });
+      return res.status(500).json({ message: err.message });
     }
   }
 
@@ -77,9 +78,9 @@ module.exports = class BooksController {
         return res.status(404).json({ message: "Livro não encontrado" });
       }
 
-      res.status(200).json({ message: "Livro encontrado com sucesso", book });
+      return res.status(200).json({ message: "Livro encontrado com sucesso", book });
     } catch (err) {
-      res.status(500).json({ message: err.message });
+      return res.status(500).json({ message: err.message });
     }
   }
 
@@ -96,7 +97,7 @@ module.exports = class BooksController {
       return res.status(422).json({ message: "Livro não encontrado" });
     }
 
-    res.status(200).json({ message: "Livro deletado com sucesso" });
+    return res.status(200).json({ message: "Livro excluido com sucesso" });
   }
 
   static async updateById(req, res) {
@@ -109,18 +110,19 @@ module.exports = class BooksController {
       category,
       status,
       review,
+      image,
     } = req.body;
 
-    const updateData = {
-      title,
-      description,
-      author,
-      reading_year,
-      category,
-      status,
-      review,
-      image,
-    };
+    console.log("Veio no controller ", req.body.status);
+    const updateData = {};
+    if (title !== undefined) updateData.title = title;
+    if (description !== undefined) updateData.description = description;
+    if (author !== undefined) updateData.author = author;
+    if (reading_year !== undefined) updateData.reading_year = reading_year;
+    if (category !== undefined) updateData.category = category;
+    if (status !== undefined) updateData.status = status;
+    if (review !== undefined) updateData.review = review;
+    if (image !== undefined) updateData.image = image;
 
     console.log(updateData);
     await Books.update(updateData, {
@@ -129,6 +131,6 @@ module.exports = class BooksController {
       },
     });
 
-    res.status(200).json({ message: "Livro atualizado com sucesso!" });
+    return res.status(200).json({ message: "Livro atualizado com sucesso!" });
   }
 };
