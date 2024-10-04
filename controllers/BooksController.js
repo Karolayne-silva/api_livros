@@ -1,37 +1,44 @@
 const Books = require("../models/Books");
 
 module.exports = class BooksController {
-
   static async create(req, res) {
-    const { title, description, author, publication_year, category } = req.body;
 
-    if (!title) {
-      return res.status(422).json;
-      ({ error: "Nome é obrigatório" });
+    const {
+      title,
+      description,
+      author,
+      reading_year,
+      category,
+      status,
+      review,
+    } = req.body;
+
+    let image = "";
+
+    const existingBook = await Books.findOne({
+      where: {
+        title,
+        description,
+      },
+    });
+
+    if (req.file) {
+      image = req.file.filename;
     }
-    if (!description) {
-      return res.status(422).json;
-      ({ error: "Descrição é obrigatório" });
-    }
-    if (!author) {
-      return res.status(422).json;
-      ({ error: "Autor é obrigatório" });
-    }
-    if (!publication_year) {
-      return res.status(422).json;
-      ({ error: "Ano de publicação é obrigatório" });
-    }
-    if (!category) {
-      return res.status(422).json;
-      ({ error: "Categoria é obrigatório" });
+
+    if (existingBook) {
+      return res.status(500).json({ message: "Já existe um livro com esse titulo e descrição" });
     }
 
     const book = {
       title,
       description,
       author,
-      publication_year,
+      reading_year,
       category,
+      status,
+      review,
+      image,
     };
 
     try {
@@ -46,9 +53,12 @@ module.exports = class BooksController {
     try {
       const books = await Books.findAll();
 
-      res
-        .status(200)
-        .json({ message: "Livros retornados com sucesso!", books });
+      if (books.length > 0) {
+        res
+          .status(200)
+          .json({ message: "Livros retornados com sucesso!", books });
+      }
+      res.status(204).send();
     } catch (err) {
       res.status(500).json({ message: err.message });
     }
@@ -57,13 +67,13 @@ module.exports = class BooksController {
   static async getById(req, res) {
     const { id } = req.params;
     try {
-      const book = await Books.findAll({
+      const book = await Books.findOne({
         where: {
           id: id,
         },
       });
 
-      if (book.length === 0) {
+      if (!book) {
         return res.status(404).json({ message: "Livro não encontrado" });
       }
 
@@ -91,51 +101,34 @@ module.exports = class BooksController {
 
   static async updateById(req, res) {
     const { id } = req.params;
-    const { title, description, author, category, publication_year } = req.body;
+    const {
+      title,
+      description,
+      author,
+      reading_year,
+      category,
+      status,
+      review,
+    } = req.body;
 
-    const updateData = {};
+    const updateData = {
+      title,
+      description,
+      author,
+      reading_year,
+      category,
+      status,
+      review,
+      image,
+    };
 
-    if (!title) {
-      return res.status(422).json;
-      ({ error: "Nome é obrigatório" });
-    } else {
-      updateData.title = title;
-    }
-    if (!description) {
-      return res.status(422).json;
-      ({ error: "Descrição é obrigatório" });
-    } else {
-      updateData.description = description;
-    }
-
-    if (!author) {
-      return res.status(422).json;
-      ({ error: "Autor é obrigatório" });
-    } else {
-      updateData.author = author;
-    }
-    if (!publication_year) {
-      return res.status(422).json;
-      ({ error: "Ano de publicação é obrigatório" });
-    } else {
-      updateData.publication_year = publication_year;
-    }
-    if (!category) {
-      return res.status(422).json;
-      ({ error: "Categoria é obrigatório" });
-    } else {
-      updateData.category = category;
-    }
-
-   console.log(updateData)
-   await Books.update(updateData, {
+    console.log(updateData);
+    await Books.update(updateData, {
       where: {
         id: id,
       },
     });
 
-    res.status(200).json({message: "Livro atualizado com sucesso!"});
+    res.status(200).json({ message: "Livro atualizado com sucesso!" });
   }
-  
-  
 };

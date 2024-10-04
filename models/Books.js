@@ -7,11 +7,11 @@ const Books = sequelize.define("Books", {
   //definição de tipos
   title: {
     type: DataTypes.STRING,
-    allowNull: false, //nao aceita falso
+    allowNull: false,
   },
   description: {
     type: DataTypes.STRING,
-    allowNull: false, //nao aceita vazio
+    allowNull: false,
   },
   author: {
     type: DataTypes.STRING,
@@ -21,7 +21,18 @@ const Books = sequelize.define("Books", {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  publication_year: {
+  image: {
+    type: DataTypes.STRING,
+  },
+  review: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+  },
+  reading_year: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+  },
+  status: {
     type: DataTypes.STRING,
     allowNull: false,
   },
