@@ -78,7 +78,9 @@ module.exports = class BooksController {
         return res.status(404).json({ message: "Livro não encontrado" });
       }
 
-      return res.status(200).json({ message: "Livro encontrado com sucesso", book });
+      return res
+        .status(200)
+        .json({ message: "Livro encontrado com sucesso", book });
     } catch (err) {
       return res.status(500).json({ message: err.message });
     }
@@ -113,8 +115,13 @@ module.exports = class BooksController {
       image,
     } = req.body;
 
-    console.log("Veio no controller ", req.body.status);
+    const book = await Books.findByPk(id);
+
+    if (!book) {
+      return res.status(404).json({ message: "Livro não encontrado" });
+    }
     const updateData = {};
+
     if (title !== undefined) updateData.title = title;
     if (description !== undefined) updateData.description = description;
     if (author !== undefined) updateData.author = author;
@@ -124,7 +131,6 @@ module.exports = class BooksController {
     if (review !== undefined) updateData.review = review;
     if (image !== undefined) updateData.image = image;
 
-    console.log(updateData);
     await Books.update(updateData, {
       where: {
         id: id,

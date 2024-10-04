@@ -1,6 +1,7 @@
 const router = require("express").Router();
+
 const {
-  validateBooks,
+  handleValidateBooks,
   handleValidationErrors,
 } = require("../middlewares/validate_books");
 const { imageUpload } = require("../middlewares/image_upload");
@@ -8,9 +9,9 @@ const BooksController = require("../controllers/BooksController");
 
 router.post(
   "/create",
-  validateBooks,
-  handleValidationErrors,
   imageUpload.single("image"),
+  handleValidateBooks(false),
+  handleValidationErrors,
   BooksController.create
 );
 
@@ -19,7 +20,7 @@ router.get("/:id", BooksController.getById);
 router.delete("/:id", BooksController.deleteById);
 router.patch(
   "/edit/:id",
-  validateBooks,
+  handleValidateBooks(true),
   handleValidationErrors,
   imageUpload.single("image"),
   BooksController.updateById
